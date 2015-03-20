@@ -30,19 +30,33 @@ var little = (function () {
             .css('transform', 'scale(' + $content.data('zoom') + ')')
             .appendTo($container);
 
-        this.zoom = function (rate, centerX, centerY) {
-            var offset = $content.offset();
-            var zoom = $content.data('zoom') * rate;
-            centerX = typeof(centerX) === 'number' ? centerX : $container.width() / 2;
-            centerY = typeof(centerY) === 'number' ? centerY : $container.height() / 2;
+        // todo: rename variables and functions to more understandable.
+        var setZoom = function (zoom, left, top) {
             $content
                 .data('zoom', zoom)
                 .attr('data-zoom', zoom)
                 .css('transform', 'scale(' + zoom + ')')
-                .offset({
-                    left: (offset.left - centerX) * rate + centerX,
-                    top:  (offset.top  - centerY) * rate + centerY,
-                });
+                .offset({ left: left, top: top });
+        }
+
+        this.move = function (offsetX, offsetY) {
+            beforeShowBiggest = null;
+            $content.offset({
+                left: $content.offset().left + offsetX,
+                top:  $content.offset().top  + offsetY,
+            });
+            return this;
+        }
+
+        this.zoom = function (rate, centerX, centerY) {
+            beforeShowBiggest = null;
+            centerX = typeof(centerX) === 'number' ? centerX : $container.width() / 2;
+            centerY = typeof(centerY) === 'number' ? centerY : $container.height() / 2;
+            setZoom(
+                $content.data('zoom') * rate,
+                ($content.offset().left - centerX) * rate + centerX,
+                ($content.offset().top  - centerY) * rate + centerY
+            );
             return this;
         }
 
@@ -61,6 +75,36 @@ var little = (function () {
             return $text.appendTo($content).focus();
         }
 
+        var beforeShowBiggest = null;
+        this.showBiggest = function () {
+            var left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
+            $content.find('.text').each(function () {
+                var $text = $(this);
+                left   = Math.min(left,   $text.data('x'));
+                top    = Math.min(top,    $text.data('y'));
+                right  = Math.max(right,  $text.data('x') + $text.width());
+                bottom = Math.max(bottom, $text.data('y') + $text.height());
+            });
+            beforeShowBiggest = { offset: $content.offset(), zoom: $content.data('zoom') };
+            var zoom = Math.min($container.width() / (right - left), $container.height() / (bottom - top)) * 0.9;
+            setZoom(
+                zoom,
+                -((left + right) * zoom - $container.width())  / 2,
+                -((top + bottom) * zoom - $container.height()) / 2
+            );
+            return this;
+        }
+
+        this.toggleBiggest = function () {
+            if (beforeShowBiggest) {
+                setZoom(beforeShowBiggest.zoom, beforeShowBiggest.offset.left, beforeShowBiggest.offset.top);
+                beforeShowBiggest = null;
+            } else {
+                this.showBiggest();
+            }
+            return this;
+        }
+
         var mousedown = false;
         var previousMouse = null;
         var previousTouches = null;
@@ -70,14 +114,11 @@ var little = (function () {
             .on('dragstart', function (e) { e.preventDefault(); })
             .on('mousedown', function (e) { previousMouse = e; mousedown = true; })
             .on('mousemove', function (e) {
-                if (mousedown) {
+                if (mousedown && ((e.pageX - previousMouse.pageX) || (e.pageY - previousMouse.pageY))) {
                     e.preventDefault();
-                    $content.offset({
-                        left: $content.offset().left + e.pageX - previousMouse.pageX,
-                        top:  $content.offset().top  + e.pageY - previousMouse.pageY,
-                    });
+                    self.move(e.pageX - previousMouse.pageX, e.pageY - previousMouse.pageY);
+                    previousMouse = e;
                 }
-                previousMouse = e;
             })
             .on('click', function (e) {
                 // ignore drag and drop
@@ -108,10 +149,7 @@ var little = (function () {
                 var touches = e.originalEvent.touches;
                 if (touches && previousTouches) {
                     if (touches.length >= 1 && previousTouches.length >= 1) {
-                        $content.offset({
-                            left: $content.offset().left + touches[0].pageX - previousTouches[0].pageX,
-                            top:  $content.offset().top  + touches[0].pageY - previousTouches[0].pageY,
-                        });
+                        self.move(touches[0].pageX - previousTouches[0].pageX, touches[0].pageY - previousTouches[0].pageY);
                     }
                     if (touches.length >= 2 && previousTouches.length >= 2) {
                         self.zoom(

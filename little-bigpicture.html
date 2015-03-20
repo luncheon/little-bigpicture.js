@@ -4,6 +4,35 @@
         <meta charset="utf-8">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="little-bigpicture.css">
+        <style>
+            * {
+                line-height: 100%;
+            }
+            #footer {
+                position: fixed;
+                left:   0;
+                right:  0;
+                bottom: 0;
+                color: rgb(192, 192, 192);
+                background-color: rgb(64, 64, 64);
+                text-align: center;
+            }
+            #toolbar {
+                display: inline-block;
+            }
+            .button {
+                display: inline-block;
+                cursor: pointer;
+                text-decoration: none;
+                color: inherit;
+                padding: 5px;
+                margin: 0 5px;
+            }
+            .button .caption {
+                font-size: 67.25%;
+                line-height: 1em;
+            }
+        </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script src="little-bigpicture.js"></script>
     </head>
@@ -18,7 +47,6 @@
             <div contenteditable="true" class="text" data-size="34" data-x="1678.21" data-y="786.772">TODO</div>
             <div contenteditable="true" class="text" data-size="11.7647" data-x="1671.79" data-y="816.566">
 * toolbar
-    + seeing biggest picture
     + dragging behavior
         - scrolling (now)
         - text moving (new)
@@ -35,6 +63,19 @@
             <div contenteditable="true" class="text" data-size="20" data-x="867.486" data-y="699.86">mind mapping tool</div>
         </div>
 
-        <script>new little.BigPicture(document.querySelector('#little-bigpicture'));</script>
+        <script>var bigpicture = new little.BigPicture(document.querySelector('#little-bigpicture'));</script>
+
+        <div id="footer">
+            <div id="toolbar">
+                <div class="button" onclick="bigpicture.toggleBiggest()">
+                    <span class="fa fa-cloud"><br>
+                    <span class="caption">Biggest</span>
+                </div>
+                <a class="button" target="_blank" href="https://github.com/luncheon/little-bigpicture.js">
+                    <span class="fa fa-github"><br>
+                    <span class="caption">GitHub</span>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
