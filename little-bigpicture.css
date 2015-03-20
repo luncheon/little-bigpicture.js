@@ -1,0 +1,38 @@
+@charset "utf-8";
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.little-bigpicture-container {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #D0D0D0;
+    background: -webkit-gradient(radial, 50% 50%, 0, 50% 50%, 500, from(#F0F0F0), to(#B0B0B0));
+    background: -webkit-radial-gradient(#F0F0F0, #B0B0B0);
+    background:    -moz-radial-gradient(#F0F0F0, #B0B0B0);
+    background:      -o-radial-gradient(#F0F0F0, #B0B0B0);
+    background:         radial-gradient(#F0F0F0, #B0B0B0);
+    -webkit-font-smoothing: antialiased;
+}
+
+.little-bigpicture-content {
+    position: absolute;
+    overflow: visible;
+}
+
+.text {
+    position: absolute;
+    white-space: pre;
+    outline: 0;
+    font-family: "Arial";
+    line-height: 1.1;
+    padding: 1px;
+}
+
+.text:focus {
+    background: #FFFFCC;
+}
