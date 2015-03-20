@@ -64,6 +64,7 @@ var little = (function () {
         var mousedown = false;
         var previousMouse = null;
         var previousTouches = null;
+        var touchmoved = false;
         $(window).on('mouseup', function (e) { mousedown = false; });
         $container
             .on('dragstart', function (e) { e.preventDefault(); })
@@ -98,7 +99,11 @@ var little = (function () {
                 );
             })
             .on('gesturestart', function (e) { e.preventDefault(); })
+            .on('touchstart', function (e) {
+                touchmoved = false;
+            })
             .on('touchmove', function (e) {
+                touchmoved = true;
                 e.preventDefault();
                 var touches = e.originalEvent.touches;
                 if (touches && previousTouches) {
@@ -126,6 +131,11 @@ var little = (function () {
             .on('touchend', function (e) {
                 e.preventDefault();
                 previousTouches = null;
+                var touches = e.originalEvent.changedTouches;
+                if (!touchmoved && touches.length === 1) {
+                    // click (unmoved touch)
+                    self.create(touches[0].pageX, touches[0].pageY);
+                }
             })
             ;
     }
