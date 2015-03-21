@@ -74,6 +74,7 @@ var little = (function () {
             return $text
                 .css('fontSize', $text.data('size') + 'px')
                 .offset({ left: $text.data('x'), top: $text.data('y') })
+                .on('keydown', function (e) { e.keyCode === 27 && this.blur(); })   // blur on Esc
                 .on('blur', function (e) { $(this).text() || $(this).remove(); });
         }
 
@@ -165,7 +166,7 @@ var little = (function () {
                 e.preventDefault();
                 previousTouches = null;
                 var touches = e.originalEvent.changedTouches;
-                if (!touchmoved && touches.length === 1) {
+                if (!touchmoved && touches.length === 1 && !$(e.target).hasClass('text')) {
                     // touch and unmoved: click
                     create(touches[0].pageX, touches[0].pageY);
                 }
