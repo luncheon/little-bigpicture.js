@@ -43,11 +43,11 @@ var little = (function () {
                 }
             },
             move: function (distanceX, distanceY, target) {
-                if (this.moving() === 'view') {
+                var $target = target ? $(target) : $(':focus');
+                if (this.moving() === 'text' && $target.hasClass('text')) {
+                    $target.offset({ left: $target.offset().left + distanceX, top: $target.offset().top + distanceY });
+                } else {
                     $view.x($view.x() - distanceX).y($view.y() - distanceY);
-                } else if (this.moving() === 'text') {
-                    var $text = target && $(target).hasClass('text') ? $(target) : $('.text:focus');
-                    $text.offset({ left: $text.offset().left + distanceX, top: $text.offset().top + distanceY });
                 }
             },
             text: {
