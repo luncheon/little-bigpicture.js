@@ -45,7 +45,7 @@ var little = (function () {
             move: function (distanceX, distanceY, target) {
                 var $target = target ? $(target) : $(':focus');
                 if (this.moving() === 'text' && $target.hasClass('text')) {
-                    $target.offset({ left: $target.offset().left + distanceX, top: $target.offset().top + distanceY });
+                    $target.offset({ left: $target.offset().left + distanceX / this.scale(), top: $target.offset().top + distanceY / this.scale() });
                 } else {
                     $view.x($view.x() - distanceX).y($view.y() - distanceY);
                 }
