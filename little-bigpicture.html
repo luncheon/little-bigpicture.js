@@ -70,6 +70,7 @@
                     .on('focus', '.text', function (e) {
                         $focused = $(this);
                         $('.toolbar.edit').show();
+                        setTimeout(function () { $(window).scrollTop(0); }, 1); // show header after virtual keyboard hides header...
                     })
                     .on('blur', '.text', function (e) {
                         setTimeout(function () {
