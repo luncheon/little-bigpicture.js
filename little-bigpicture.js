@@ -42,11 +42,11 @@ var little = (function () {
                     return this.data('moving', moving).attr('data-moving', moving);
                 }
             },
-            move: function (distanceX, distanceY) {
+            move: function (distanceX, distanceY, target) {
                 if (this.moving() === 'view') {
                     $view.x($view.x() - distanceX).y($view.y() - distanceY);
                 } else if (this.moving() === 'text') {
-                    var $text = $('.text:focus');
+                    var $text = target && $(target).hasClass('text') ? $(target) : $('.text:focus');
                     $text.offset({ left: $text.offset().left + distanceX, top: $text.offset().top + distanceY });
                 }
             },
@@ -163,7 +163,7 @@ var little = (function () {
                 var touches = e.originalEvent.touches;
                 if (touches && previousTouches) {
                     if (touches.length >= 1 && previousTouches.length >= 1) {
-                        $view.move(touches[0].pageX - previousTouches[0].pageX, touches[0].pageY - previousTouches[0].pageY);
+                        $view.move(touches[0].pageX - previousTouches[0].pageX, touches[0].pageY - previousTouches[0].pageY, e.target);
                     }
                     if (touches.length >= 2 && previousTouches.length >= 2) {
                         $view.focusingScale(
@@ -181,11 +181,14 @@ var little = (function () {
                 }
             })
             .on('touchend', function (e) {
-                e.preventDefault();
                 previousTouches = null;
+                if (touchmoved) {
+                    e.preventDefault();
+                }
                 var touches = e.originalEvent.changedTouches;
                 if (!touchmoved && touches.length === 1 && !$(e.target).hasClass('text')) {
                     // touch and unmoved: click
+                    e.preventDefault();
                     $view.text.create(touches[0].pageX, touches[0].pageY);
                 }
             })
