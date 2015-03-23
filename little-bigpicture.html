@@ -19,6 +19,7 @@
                 </span>
             </div>
             <div class="toolbar edit" style="display: none;">
+                <span class="button" id="link"><span class="fa fa-link"><span class="caption">link</span></span></span>
                 <span class="button nocaption" id="size-up"  ><span class="fa fa-font"></span>+</span>
                 <span class="button nocaption" id="size-down"><span class="fa fa-font"></span>-</span>
             </div>
@@ -33,17 +34,14 @@
                 <div contenteditable="true" class="text" data-size="20" data-x="1569.31" data-y="1022.37">More features to come...</div>
                 <div contenteditable="true" class="text" data-size="20" data-x="1200.31" data-y="558.372">Don't forget to zoom out...<br />... to see the BigPicture<br /></div>
                 <div contenteditable="true" class="text" data-size="34" data-x="1678.21" data-y="786.772">TODO</div>
-                <div contenteditable="true" class="text" data-size="11.7647" data-x="1671.79" data-y="816.566">
-* toolbar
-    + dragging behavior
-        - scrolling (now)
-        - text moving (new)
-* saving
+                <div contenteditable="true" class="text" data-size="14" data-x="1671.79" data-y="816.566">
+* text color
+* search (use browser's search function if possible)
+* bookmark: save/restore scale and position
+* mini map: indicates whole view and current visible area
+* save
     + localStorage
-    + generate html
     + generate parameterized url
-* text style (font, color, etc.)
-* touchmove more smoothly
                 </div>
                 <div contenteditable="true" class="text" data-size="11.7647" data-x="1787.46" data-y="792.461">buy some chocolate</div>
                 <div contenteditable="true" class="text" data-size="98.26" data-x="-2070.87" data-y="1698.75">This is not the biggest text yet... <br /></div>
@@ -59,6 +57,11 @@
                 'use strict';
 
                 var $focused = null;
+
+                $('#link').on('mousedown touchstart', function () {
+                    bigpicture.text.link($focused, prompt('url', bigpicture.text.link($focused)));
+                });
+
                 $('#size-up'  ).on('mousedown touchstart', $.proxy(setTimeout, window, function () {
                     bigpicture.text.size($focused, bigpicture.text.size($focused) * 1.25).focus();
                 }, 1));

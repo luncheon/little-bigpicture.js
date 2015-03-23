@@ -76,6 +76,15 @@ var little = (function () {
                         return $(element).data('size', size).attr('data-size', size).css('fontSize', size + 'px');
                     }
                 },
+                link: function (element, link) {
+                    if (link === void 0) {
+                        return $(element).find('a').attr('href');
+                    } else {
+                        $(element).find('a').remove();
+                        link && $('<a>').addClass('fa fa-external-link').attr('href', link).appendTo(element);
+                        return $(element);
+                    }
+                },
             },
             biggest: {
                 previous: null,
@@ -140,7 +149,7 @@ var little = (function () {
                     return;
                 }
                 // edit existing
-                if ($(e.target).hasClass('text')) {
+                if ($(e.target).hasClass('text') || $(e.target).is('a')) {
                     return;
                 }
                 $view.text.create(e.pageX, e.pageY);
@@ -185,8 +194,11 @@ var little = (function () {
                 if (touchmoved) {
                     e.preventDefault();
                 }
+                if ($(e.target).hasClass('text') || $(e.target).is('a')) {
+                    return;
+                }
                 var touches = e.originalEvent.changedTouches;
-                if (!touchmoved && touches.length === 1 && !$(e.target).hasClass('text')) {
+                if (!touchmoved && touches.length === 1) {
                     // touch and unmoved: click
                     e.preventDefault();
                     $view.text.create(touches[0].pageX, touches[0].pageY);
