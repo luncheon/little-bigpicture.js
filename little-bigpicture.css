@@ -1,9 +1,18 @@
 @charset "utf-8";
 
+* {
+    line-height: 100%;
+    font-family: inherit;
+}
+
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+}
+
+a {
+    text-decoration: none;
 }
 
 .little-bigpicture-container {
@@ -28,11 +37,81 @@ html, body {
     position: absolute;
     white-space: pre;
     outline: 0;
-    font-family: "Arial";
     line-height: 1.1;
     padding: 1px;
 }
 
 .text:focus {
     background: #FFFFCC;
+}
+
+
+#content {
+    position: absolute;
+    left: 0;
+    top: 40px;
+    right: 0;
+    bottom: 0;
+    font-family: Arial,sans-serif;
+}
+
+#header {
+    height: 40px;
+    color: rgb(248, 248, 248);
+    background-color: rgb(64, 64, 64);
+    overflow: hidden;
+}
+
+.toolbar {
+    float: left;
+    height: 40px;
+}
+
+.toolbar .button {
+    line-height: 40px;
+    display: inline;
+    vertical-align: middle;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    padding: 0 8px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.toolbar .button:hover {
+    color: #FFFFC0;
+}
+.toolbar .button .fa {
+    font-size: 20px;
+}
+.toolbar .button .caption {
+    font-family: Verdana,sans-serif;
+    font-size: 16px;
+    margin-left: .4em;
+}
+@media (max-width: 480px) {
+    .toolbar .button {
+        display: inline-block;
+        padding: 6px 4px;
+        text-align: center;
+    }
+    .toolbar .button .fa {
+        font-size: 16px;
+    }
+    .toolbar .button .caption {
+        font-size: 12px;
+        display: block;
+    }
+    .toolbar .nocaption .fa {
+        font-size: 20px;
+    }
+}
+
+.toolbar.edit {
+    float: right;
 }

@@ -35,6 +35,33 @@ var little = (function () {
                     return this.offset({left: this.offset().left, top: -y}).trigger('offset');
                 }
             },
+            text: {
+                create: function (pageX, pageY) {
+                    var $text = $('<div>').addClass('text')
+                        .attr({
+                            'contentEditable': true,
+                            'data-size': 20 / $view.scale(),
+                            'data-x': (pageX + $view.x()) / $view.scale(),
+                            'data-y': (pageY + $view.y()) / $view.scale(),
+                        });
+                    return this.setup($text).appendTo($view).focus();
+                },
+                setup: function (element) {
+                    var $text = $(element);
+                    return $text
+                        .css('fontSize', $text.data('size') + 'px')
+                        .offset({ left: $text.data('x'), top: $text.data('y') })
+                        .on('keydown', function (e) { e.keyCode === 27 && this.blur(); })   // blur on Esc
+                        .on('blur', function (e) { $(this).text() || $(this).remove(); });
+                },
+                size: function (element, size) {
+                    if (size === void 0) {
+                        return $(element).data('size');
+                    } else {
+                        return $(element).data('size', size).attr('data-size', size).css('fontSize', size + 'px');
+                    }
+                },
+            },
             biggest: {
                 previous: null,
                 rectangle: function () {
@@ -69,35 +96,13 @@ var little = (function () {
             },
         });
 
-        var setupText = function (element) {
-            var $text = $(element);
-            return $text
-                .css('fontSize', $text.data('size') + 'px')
-                .offset({ left: $text.data('x'), top: $text.data('y') })
-                .on('keydown', function (e) { e.keyCode === 27 && this.blur(); })   // blur on Esc
-                .on('blur', function (e) { $(this).text() || $(this).remove(); });
-        }
-
-        $view.find('.text').each(function () { setupText(this) });
+        $view.find('.text').each(function () { $view.text.setup(this) });
         $view.addClass('little-bigpicture-content')
              .scale($view.data('scale') || 1)
              .x($view.data('x'))
              .y($view.data('y'))
              .on('scale offset', function (e) { $view.biggest.previous = null; })
              .appendTo($container);
-
-        var create = function (pageX, pageY) {
-            var $text = $('<div>')
-                .addClass('text')
-                .attr({
-                    'contentEditable': true,
-                    'data-size': 20 / $view.scale(),
-                    'data-x': (pageX + $view.x()) / $view.scale(),
-                    'data-y': (pageY + $view.y()) / $view.scale(),
-                });
-            setupText($text);
-            return $text.appendTo($view).focus();
-        }
 
         var mousedown = false;
         var previousMouse = null;
@@ -124,7 +129,7 @@ var little = (function () {
                 if ($(e.target).hasClass('text')) {
                     return;
                 }
-                create(e.pageX, e.pageY);
+                $view.text.create(e.pageX, e.pageY);
             })
             .on('wheel', function (e) {
                 e.preventDefault();
@@ -168,7 +173,7 @@ var little = (function () {
                 var touches = e.originalEvent.changedTouches;
                 if (!touchmoved && touches.length === 1 && !$(e.target).hasClass('text')) {
                     // touch and unmoved: click
-                    create(touches[0].pageX, touches[0].pageY);
+                    $view.text.create(touches[0].pageX, touches[0].pageY);
                 }
             })
             ;
