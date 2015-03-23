@@ -58,29 +58,33 @@
 
                 var $focused = null;
 
-                $('#link').on('mousedown touchstart', function () {
+                $('#link').on('mousedown', function () {
                     bigpicture.text.link($focused, prompt('url', bigpicture.text.link($focused)));
                 });
 
-                $('#size-up'  ).on('mousedown touchstart', $.proxy(setTimeout, window, function () {
+                $('#size-up').on('mousedown', $.proxy(setTimeout, window, function () {
                     bigpicture.text.size($focused, bigpicture.text.size($focused) * 1.25).focus();
-                }, 1));
-                $('#size-down').on('mousedown touchstart', $.proxy(setTimeout, window, function () {
+                }, 0));
+                $('#size-down').on('mousedown', $.proxy(setTimeout, window, function () {
                     bigpicture.text.size($focused, bigpicture.text.size($focused) / 1.25).focus();
-                }, 1));
+                }, 0));
 
                 $(document)
                     .on('focus', '.text', function (e) {
                         $focused = $(this);
                         $('.toolbar.edit').show();
-                        setTimeout(function () { $(window).scrollTop(0); }, 1); // show header after virtual keyboard hides header...
+                        setTimeout(function () {
+                            // show header after virtual keyboard hides header...
+                            bigpicture.y(bigpicture.y() + $(window).scrollTop());
+                            $(window).scrollTop(0);
+                        }, 0);
                     })
                     .on('blur', '.text', function (e) {
                         setTimeout(function () {
                             if (!$focused.is(':focus')) {
                                 $('.toolbar.edit').hide();
                             }
-                        }, 2);
+                        }, 0);
                     })
                 ;
             })();
