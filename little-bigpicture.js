@@ -81,7 +81,7 @@ var little = (function () {
                         return $(element).find('a').attr('href');
                     } else {
                         $(element).find('a').remove();
-                        link && $('<a>').addClass('fa fa-external-link').attr('href', link).appendTo(element);
+                        link && $('<a>').addClass('fa fa-external-link').attr({ href: link, target: '_blank' }).appendTo(element);
                         return $(element);
                     }
                 },
