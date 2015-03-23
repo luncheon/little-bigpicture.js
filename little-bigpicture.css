@@ -44,6 +44,9 @@ a {
 .text:focus {
     background: #FFFFCC;
 }
+[data-moving=text] .text {
+    cursor: move;
+}
 
 
 #content {
@@ -88,8 +91,12 @@ a {
     user-select: none;
 }
 .toolbar .button:hover {
-    color: #FFFFC0;
+    color: rgb(255, 255, 192);
 }
+.toolbar .button.selected {
+    color: rgb(128, 192, 255);
+}
+
 .toolbar .button .fa {
     font-size: 20px;
 }

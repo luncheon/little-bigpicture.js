@@ -12,7 +12,10 @@
         <div id="header">
             <div class="toolbar">
                 <span class="button" onclick="bigpicture.biggest.toggle()">
-                    <div class="fa fa-cloud"><span class="caption">Biggest</span></div>
+                    <div class="fa fa-cloud"><span class="caption">biggest</span></div>
+                </span>
+                <span class="button" onclick="bigpicture.moving($(this).toggleClass('selected').hasClass('selected')?'text':'view')">
+                    <div class="fa fa-arrows"><span class="caption">move</span></div>
                 </span>
             </div>
             <div class="toolbar edit" style="display: none;">
@@ -22,7 +25,7 @@
         </div>
 
         <div id="content">
-            <div id="little-bigpicture" data-zoom="1" data-x="721" data-y="480" spellcheck="false">
+            <div id="little-bigpicture" data-scale="1" data-x="721" data-y="480" data-moving="view" spellcheck="false">
                 <div contenteditable="true" class="text" data-size="57" data-x="941" data-y="735">What is Little BigPicture ?</div>
                 <div contenteditable="true" class="text" data-size="11.7647" data-x="977.918" data-y="812.327">Little BigPicture is like an infinite notepad, in which you can pan (north/south/east/west),<br />but also in which you can ZOOM ! (Nearly) infinitely many times.<br /></div>
                 <div contenteditable="true" class="text" data-size="20" data-x="853.918" data-y="946.974">Easy write in one click : click anywhere and write!</div>
@@ -51,10 +54,9 @@
         </div>
 
         <script>
+            var bigpicture = little.bigpicture(document.querySelector('#little-bigpicture'));
             (function () {
                 'use strict';
-
-                var bigpicture = little.bigpicture(document.querySelector('#little-bigpicture'));
 
                 var $focused = null;
                 $('#size-up'  ).on('mousedown touchstart', $.proxy(setTimeout, window, function () {

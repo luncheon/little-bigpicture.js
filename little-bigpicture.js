@@ -35,6 +35,21 @@ var little = (function () {
                     return this.offset({left: this.offset().left, top: -y}).trigger('offset');
                 }
             },
+            moving: function (moving) {
+                if (moving === void 0) {
+                    return this.data('moving');
+                } else {
+                    return this.data('moving', moving).attr('data-moving', moving);
+                }
+            },
+            move: function (distanceX, distanceY) {
+                if (this.moving() === 'view') {
+                    $view.x($view.x() - distanceX).y($view.y() - distanceY);
+                } else if (this.moving() === 'text') {
+                    var $text = $('.text:focus');
+                    $text.offset({ left: $text.offset().left + distanceX, top: $text.offset().top + distanceY });
+                }
+            },
             text: {
                 create: function (pageX, pageY) {
                     var $text = $('<div>').addClass('text')
@@ -115,8 +130,7 @@ var little = (function () {
             .on('mousemove', function (e) {
                 if (mousedown && ((e.pageX - previousMouse.pageX) || (e.pageY - previousMouse.pageY))) {
                     e.preventDefault();
-                    $view.x($view.x() + previousMouse.pageX - e.pageX)
-                         .y($view.y() + previousMouse.pageY - e.pageY);
+                    $view.move(e.pageX - previousMouse.pageX, e.pageY - previousMouse.pageY);
                     previousMouse = e;
                 }
             })
@@ -149,8 +163,7 @@ var little = (function () {
                 var touches = e.originalEvent.touches;
                 if (touches && previousTouches) {
                     if (touches.length >= 1 && previousTouches.length >= 1) {
-                        $view.x($view.x() + previousTouches[0].pageX - touches[0].pageX)
-                             .y($view.y() + previousTouches[0].pageY - touches[0].pageY);
+                        $view.move(touches[0].pageX - previousTouches[0].pageX, touches[0].pageY - previousTouches[0].pageY);
                     }
                     if (touches.length >= 2 && previousTouches.length >= 2) {
                         $view.focusingScale(
