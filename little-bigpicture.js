@@ -10,11 +10,10 @@ var little = (function () {
             return parseFloat(pixel.replace(/px$/, ''));
         }
         var $view = $.extend($(element), {
-            localStorage: {
+            json: {
                 formatVersion: 0.1,
-                defaultName: 'default',
-                load: function (name) {
-                    var data = localStorage && JSON.parse(localStorage.getItem(name || this.defaultName));
+                extract: function (jsonString) {
+                    var data = JSON.parse(jsonString);
                     if (data && data.formatVersion === this.formatVersion) {
                         $view.find('.text').remove();
                         $view.scale(data.view.scale).css({ left: data.view.x, top: data.view.y });
@@ -23,18 +22,31 @@ var little = (function () {
                         });
                     }
                 },
-                save: function (name) {
-                    var data = {
+                generate: function () {
+                    return JSON.stringify({
                         formatVersion: this.formatVersion,
                         view: { x: parsePixel($view.css('left')), y: parsePixel($view.css('top')), scale: $view.scale() },
                         text: Array.prototype.map.call($('.text'), function (item) {
                             return { x: $view.text.x(item), y: $view.text.y(item), size: $view.text.size(item), html: $(item).html() }
                         }),
-                    };
-                    localStorage && localStorage.setItem(name || this.defaultName, JSON.stringify(data));
+                    });
                 },
-                remove: function (name) {
-                    localStorage.removeItem(name || this.defaultName);
+            },
+            localStorage: {
+                defaultName: 'default',
+                load:   function (name) { $view.json.extract(localStorage.getItem(name || this.defaultName)); },
+                save:   function (name) { localStorage.setItem(name || this.defaultName, $view.json.generate()); },
+                remove: function (name) { localStorage.removeItem(name || this.defaultName); },
+            },
+            url: {
+                queryPrefix: '?data=',
+                parse: function () {
+                    if (location.search && location.search.startsWith(this.queryPrefix)) {
+                        $view.json.extract(decodeURIComponent(location.search.slice(this.queryPrefix.length)));
+                    }
+                },
+                generate: function () {
+                    return location.protocol + '//' + location.host + location.pathname + this.queryPrefix + encodeURIComponent($view.json.generate());
                 },
             },
             scale: function (scale) {

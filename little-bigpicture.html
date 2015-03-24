@@ -13,22 +13,29 @@
     <body>
         <div id="header">
             <div class="toolbar">
-                <span class="button" onclick="bigpicture.localStorage.save();">
-                    <span class="fa fa-save"><span class="caption">save</span></span>
+                <span class="button" onclick="bigpicture.localStorage.save();" title="save to localStorage">
+                    <span class="fa fa-database"><span class="caption">save</span></span>
                 </span>
-                <span class="button" onclick="bigpicture.biggest.toggle()">
-                    <div class="fa fa-cloud"><span class="caption">biggest</span></div>
+                <span class="button" onclick="prompt('parameterized url', bigpicture.url.generate());" title="generate parameterized url">
+                    <span class="fa fa-anchor"><span class="caption">to url</span></span>
                 </span>
-                <span class="button" onclick="bigpicture.moving($(this).toggleClass('selected').hasClass('selected')?'text':'view')">
+                <span class="button" onclick="bigpicture.biggest.toggle()" title="whole view">
+                    <div class="fa fa-cloud"><span class="caption">whole</span></div>
+                </span>
+                <span class="button" onclick="bigpicture.moving($(this).toggleClass('selected').hasClass('selected')?'text':'view')" title="drag to move text">
                     <div class="fa fa-arrows"><span class="caption">move</span></div>
                 </span>
             </div>
             <div class="toolbar edit" style="display: none;">
-                <span class="button" id="link">
+                <span class="button" id="link" title="link">
                     <span class="fa fa-link"><span class="caption">link</span></span>
                 </span>
-                <span class="button nocaption" id="size-up"  ><span class="fa fa-font"></span>+</span>
-                <span class="button nocaption" id="size-down"><span class="fa fa-font"></span>-</span>
+                <span class="button nocaption" id="size-up" title="increment font size">
+                    <span class="fa fa-font"></span>+
+                </span>
+                <span class="button nocaption" id="size-down" title="decrement font size">
+                    <span class="fa fa-font"></span>-
+                </span>
             </div>
         </div>
 
@@ -46,7 +53,6 @@
 * search (use browser's search function if possible)
 * bookmark: save/restore scale and position
 * mini map: indicates whole view and current visible area
-* generate parameterized url
                 </div>
                 <div contenteditable="true" class="text" data-size="11.7647" data-x="1787.46" data-y="792.461">buy some chocolate</div>
                 <div contenteditable="true" class="text" data-size="98.26" data-x="-2070.87" data-y="1698.75">This is not the biggest text yet... <br /></div>
@@ -61,7 +67,11 @@
             (function () {
                 'use strict';
 
-                bigpicture.localStorage.load();
+                if (location.search) {
+                    bigpicture.url.parse();
+                } else if (localStorage) {
+                    bigpicture.localStorage.load();
+                }
 
                 var $focused = null;
 
