@@ -42,11 +42,11 @@ var little = (function () {
                 queryPrefix: '?data=',
                 parse: function () {
                     if (location.search && location.search.slice(0, this.queryPrefix.length) === this.queryPrefix) {
-                        $view.json.extract(decodeURIComponent(location.search.slice(this.queryPrefix.length)));
+                        $view.json.extract(LZString.decompressFromEncodedURIComponent(location.search.slice(this.queryPrefix.length)));
                     }
                 },
                 generate: function () {
-                    return location.protocol + '//' + location.host + location.pathname + this.queryPrefix + encodeURIComponent($view.json.generate());
+                    return location.protocol + '//' + location.host + location.pathname + this.queryPrefix + LZString.compressToEncodedURIComponent($view.json.generate());
                 },
             },
             scale: function (scale) {
