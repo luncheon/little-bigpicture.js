@@ -41,7 +41,7 @@ var little = (function () {
             url: {
                 queryPrefix: '?data=',
                 parse: function () {
-                    if (location.search && location.search.startsWith(this.queryPrefix)) {
+                    if (location.search && location.search.slice(0, this.queryPrefix.length) === this.queryPrefix) {
                         $view.json.extract(decodeURIComponent(location.search.slice(this.queryPrefix.length)));
                     }
                 },
