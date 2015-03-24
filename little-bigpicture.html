@@ -11,6 +11,9 @@
     <body>
         <div id="header">
             <div class="toolbar">
+                <span class="button" onclick="bigpicture.localStorage.save();">
+                    <span class="fa fa-save"><span class="caption">save</span></span>
+                </span>
                 <span class="button" onclick="bigpicture.biggest.toggle()">
                     <div class="fa fa-cloud"><span class="caption">biggest</span></div>
                 </span>
@@ -19,7 +22,9 @@
                 </span>
             </div>
             <div class="toolbar edit" style="display: none;">
-                <span class="button" id="link"><span class="fa fa-link"><span class="caption">link</span></span></span>
+                <span class="button" id="link">
+                    <span class="fa fa-link"><span class="caption">link</span></span>
+                </span>
                 <span class="button nocaption" id="size-up"  ><span class="fa fa-font"></span>+</span>
                 <span class="button nocaption" id="size-down"><span class="fa fa-font"></span>-</span>
             </div>
@@ -39,15 +44,13 @@
 * search (use browser's search function if possible)
 * bookmark: save/restore scale and position
 * mini map: indicates whole view and current visible area
-* save
-    + localStorage
-    + generate parameterized url
+* generate parameterized url
                 </div>
                 <div contenteditable="true" class="text" data-size="11.7647" data-x="1787.46" data-y="792.461">buy some chocolate</div>
                 <div contenteditable="true" class="text" data-size="98.26" data-x="-2070.87" data-y="1698.75">This is not the biggest text yet... <br /></div>
                 <div contenteditable="true" class="text" data-size="482.751" data-x="3394.25" data-y="3171.58">Think outside the box.</div>
                 <div contenteditable="true" class="text" data-size="20" data-x="867.486" data-y="699.86">mind mapping tool</div>
-                <a class="text" data-size="36" data-x="1080" data-y="640" target="_blank" href="https://github.com/luncheon/little-bigpicture.js"><span class="fa fa-github"></span>GitHub</a>
+                <div contenteditable="true" class="text" data-size="36" data-x="1080" data-y="640" ><a class="text" target="_blank" href="https://github.com/luncheon/little-bigpicture.js"><span class="fa fa-github"></span>GitHub</a></div>
             </div>
         </div>
 
@@ -55,6 +58,8 @@
             var bigpicture = little.bigpicture(document.querySelector('#little-bigpicture'));
             (function () {
                 'use strict';
+
+                bigpicture.localStorage.load();
 
                 var $focused = null;
 

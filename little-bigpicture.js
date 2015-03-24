@@ -6,12 +6,42 @@ var little = (function () {
             .addClass('little-bigpicture-container')
             .insertBefore(element);
 
+        var parsePixel = function (pixel) {
+            return parseFloat(pixel.replace(/px$/, ''));
+        }
         var $view = $.extend($(element), {
+            localStorage: {
+                formatVersion: 0.1,
+                defaultName: 'default',
+                load: function (name) {
+                    var data = localStorage && JSON.parse(localStorage.getItem(name || this.defaultName));
+                    if (data && data.formatVersion === this.formatVersion) {
+                        $view.find('.text').remove();
+                        $view.scale(data.view.scale).css({ left: data.view.x, top: data.view.y });
+                        data.text.forEach(function (item) {
+                            $view.text.create(item.x, item.y, item.size).html(item.html);
+                        });
+                    }
+                },
+                save: function (name) {
+                    var data = {
+                        formatVersion: this.formatVersion,
+                        view: { x: parsePixel($view.css('left')), y: parsePixel($view.css('top')), scale: $view.scale() },
+                        text: Array.prototype.map.call($('.text'), function (item) {
+                            return { x: $view.text.x(item), y: $view.text.y(item), size: $view.text.size(item), html: $(item).html() }
+                        }),
+                    };
+                    localStorage && localStorage.setItem(name || this.defaultName, JSON.stringify(data));
+                },
+                remove: function (name) {
+                    localStorage.removeItem(name || this.defaultName);
+                },
+            },
             scale: function (scale) {
                 if (scale === void 0) {
                     return this.data('scale');
                 } else {
-                    return this.data('scale', scale).attr('data-scale', scale).css('transform', 'scale(' + scale + ')').trigger('scale', scale);
+                    return this.data('scale', scale).css('transform', 'scale(' + scale + ')').trigger('scale', scale);
                 }
             },
             focusingScale: function (rate, centerX, centerY) {
@@ -51,31 +81,25 @@ var little = (function () {
                 }
             },
             text: {
-                create: function (pageX, pageY) {
-                    var $text = $('<div>').addClass('text')
-                        .attr({
-                            'contentEditable': true,
-                            'data-size': 20 / $view.scale(),
-                            'data-x': (pageX + $view.x()) / $view.scale(),
-                            'data-y': (pageY + $view.y()) / $view.scale(),
-                        });
-                    return this.setup($text).appendTo($view).focus();
-                },
                 setup: function (element) {
-                    var $text = $(element);
-                    return $text
-                        .css('fontSize', $text.data('size') + 'px')
-                        .offset({ left: $text.data('x'), top: $text.data('y') })
+                    $(element)
                         .on('keydown', function (e) { e.keyCode === 27 && this.blur(); })   // blur on Esc
                         .on('blur', function (e) { $(this).text() || $(this).remove(); });
                 },
-                size: function (element, size) {
-                    if (size === void 0) {
-                        return $(element).data('size');
-                    } else {
-                        return $(element).data('size', size).attr('data-size', size).css('fontSize', size + 'px');
-                    }
+                create: function (x, y, size) {
+                    var $text = $('<div>').addClass('text').attr('contentEditable', true);
+                    this.x($text, x);
+                    this.y($text, y);
+                    this.size($text, size);
+                    this.setup($text);
+                    return $text.appendTo($view);
                 },
+                createOnPageCoordinate: function (pageX, pageY) {
+                    return this.create((pageX + $view.x()) / $view.scale(), (pageY + $view.y()) / $view.scale(), 20 / $view.scale()).focus();
+                },
+                x:    function (element, x) { return x === void 0 ? parsePixel($(element).css('left'))     : $(element).css('left',     x + 'px'); },
+                y:    function (element, y) { return y === void 0 ? parsePixel($(element).css('top'))      : $(element).css('top',      y + 'px'); },
+                size: function (element, s) { return s === void 0 ? parsePixel($(element).css('fontSize')) : $(element).css('fontSize', s + 'px'); },
                 link: function (element, link) {
                     if (link === void 0) {
                         return $(element).find('a').attr('href');
@@ -91,11 +115,10 @@ var little = (function () {
                 rectangle: function () {
                     var left = Infinity, top = Infinity, right = -Infinity, bottom = -Infinity;
                     $view.find('.text').each(function () {
-                        var $text = $(this);
-                        left   = Math.min(left,   $text.data('x'));
-                        top    = Math.min(top,    $text.data('y'));
-                        right  = Math.max(right,  $text.data('x') + $text.width());
-                        bottom = Math.max(bottom, $text.data('y') + $text.height());
+                        left   = Math.min(left,   $view.text.x(this));
+                        top    = Math.min(top,    $view.text.y(this));
+                        right  = Math.max(right,  $view.text.x(this) + $(this).width());
+                        bottom = Math.max(bottom, $view.text.y(this) + $(this).height());
                     });
                     return { left: left, top: top, right: right, bottom: bottom, width: right - left, height: bottom - top, centerX: (left + right) / 2, centerY: (top + bottom) / 2 };
                 },
@@ -120,13 +143,15 @@ var little = (function () {
             },
         });
 
-        $view.find('.text').each(function () { $view.text.setup(this) });
         $view.addClass('little-bigpicture-content')
              .scale($view.data('scale') || 1)
              .x($view.data('x'))
              .y($view.data('y'))
              .on('scale offset', function (e) { $view.biggest.previous = null; })
-             .appendTo($container);
+             .appendTo($container)
+             .find('.text').each(function () {
+                 $view.text.setup($(this).css({ left: $(this).data('x'), top: $(this).data('y'), fontSize: $(this).data('size') + 'px' }));
+             });
 
         var mousedown = false;
         var previousMouse = null;
@@ -140,8 +165,8 @@ var little = (function () {
                 if (mousedown && ((e.pageX - previousMouse.pageX) || (e.pageY - previousMouse.pageY))) {
                     e.preventDefault();
                     $view.move(e.pageX - previousMouse.pageX, e.pageY - previousMouse.pageY);
-                    previousMouse = e;
                 }
+                previousMouse = e;
             })
             .on('click', function (e) {
                 // ignore drag and drop
@@ -152,7 +177,7 @@ var little = (function () {
                 if ($(e.target).hasClass('text') || $(e.target).is('a')) {
                     return;
                 }
-                $view.text.create(e.pageX, e.pageY);
+                $view.text.createOnPageCoordinate(e.pageX, e.pageY);
             })
             .on('wheel', function (e) {
                 e.preventDefault();
@@ -201,7 +226,7 @@ var little = (function () {
                 if (!touchmoved && touches.length === 1) {
                     // touch and unmoved: click
                     e.preventDefault();
-                    $view.text.create(touches[0].pageX, touches[0].pageY);
+                    $view.text.createOnPageCoordinate(touches[0].pageX, touches[0].pageY);
                 }
             })
             ;
