@@ -210,6 +210,7 @@ var little = (function () {
         var previousTouches = null;
         $container
             .on('dragstart gesturestart touchend', function (e) { e.preventDefault(); })
+            .on('mousemove touchmove', function (e) { $(e.target).is(':focus') || e.preventDefault(); })
             .on('mousedown touchstart', function (e) { $(e.target).hasClass('selected') || $view.text.select(null); })
             .on('dragging', function (e, previous, current) {
                 $(e.target).hasClass('selected') || $view.x($view.x() + previous.pageX - current.pageX).y($view.y() + previous.pageY - current.pageY);
@@ -223,10 +224,6 @@ var little = (function () {
                 $view.focusingScale(o.deltaY < 0 ? 1.6 : 0.625, o.pageX, o.pageY);
             })
             .on('touchmove', function (e) {
-                if ($(e.target).is(':focus')) {
-                    return;
-                }
-                e.preventDefault();
                 var touches = e.originalEvent.touches;
                 if (touches && previousTouches && touches.length >= 2 && previousTouches.length >= 2) {
                     $view.focusingScale(

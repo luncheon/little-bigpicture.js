@@ -33,21 +33,17 @@ a {
     outline: 0;
     line-height: 1.1;
     padding: 1px;
-    min-width: .5em;
     cursor: default;
 }
-
 .text.selected {
     background: #FFFFCC;
     cursor: move;
 }
 .text:focus {
     background: #FFFFFF;
+    min-width: .75em;
+    cursor: text;
 }
-[data-moving=text] .text {
-    cursor: move;
-}
-
 
 #content {
     position: absolute;
@@ -90,7 +86,6 @@ a {
     padding: 0 .5em;
     color: inherit;
     cursor: pointer;
-    text-decoration: none;
     display: table-cell;
     vertical-align: middle;
     text-align: center;
