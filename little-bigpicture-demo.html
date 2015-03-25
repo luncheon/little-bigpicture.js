@@ -76,13 +76,12 @@
                 $('#size-up'  ).on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) * 1.25) }); });
                 $('#size-down').on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) / 1.25) }); });
 
-                $(document).on('focus', '.text', function (e) {
-                    setTimeout(function () {
-                        // show header after virtual keyboard hides header...
-                        bigpicture.y(bigpicture.y() + $(window).scrollTop());
-                        $(window).scrollTop(0);
-                    }, 0);
-                });
+                // fix virtual keyboard problems...
+                var onscroll = function (e) {
+                    bigpicture.y(bigpicture.y() + $(window).scrollTop());
+                    $(window).off('scroll').scrollTop(0).on('scroll', onscroll);
+                }
+                $(window).on('scroll', onscroll);
             })();
         </script>
     </body>
