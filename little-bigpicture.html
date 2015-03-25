@@ -15,23 +15,27 @@
         <div id="header">
             <div class="toolbar">
                 <span class="button" onclick="bigpicture.localStorage.save();" title="save to localStorage">
-                    <span class="fa fa-database"><span class="caption">save</span></span>
+                    <span class="fa fa-database"></span>
+                    <span class="caption">save</span>
                 </span>
                 <span class="button" onclick="prompt('parameterized url', bigpicture.url.generate());" title="generate parameterized url">
-                    <span class="fa fa-anchor"><span class="caption">to url</span></span>
+                    <span class="fa fa-anchor"></span>
+                    <span class="caption">to url</span>
                 </span>
                 <span class="button" onclick="bigpicture.biggest.toggle()" title="whole view">
-                    <div class="fa fa-cloud"><span class="caption">whole</span></div>
+                    <span class="fa fa-cloud"></span>
+                    <span class="caption">whole</span>
                 </span>
             </div>
             <div class="toolbar edit" style="display: none;">
                 <span class="button" id="link" title="link">
-                    <span class="fa fa-link"><span class="caption">link</span></span>
+                    <span class="fa fa-link"></span>
+                    <span class="caption">link</span>
                 </span>
-                <span class="button nocaption" id="size-up" title="increment font size">
+                <span class="button" id="size-up" title="increment font size">
                     <span class="fa fa-font"></span>+
                 </span>
-                <span class="button nocaption" id="size-down" title="decrement font size">
+                <span class="button" id="size-down" title="decrement font size">
                     <span class="fa fa-font"></span>-
                 </span>
             </div>
