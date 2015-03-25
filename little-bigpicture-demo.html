@@ -14,10 +14,6 @@
     <body>
         <div id="header">
             <div class="toolbar">
-                <span class="button" onclick="bigpicture.localStorage.save();" title="save to localStorage">
-                    <span class="fa fa-database"></span>
-                    <span class="caption">save</span>
-                </span>
                 <span class="button" onclick="prompt('parameterized url', bigpicture.url.generate());" title="generate parameterized url">
                     <span class="fa fa-anchor"></span>
                     <span class="caption">to url</span>
@@ -72,8 +68,6 @@
 
                 if (location.search) {
                     bigpicture.url.parse();
-                } else if (localStorage) {
-                    bigpicture.localStorage.load();
                 }
 
                 bigpicture.on('select', function (e, selected) { $('.toolbar.edit').toggle(selected ? true : false); });
