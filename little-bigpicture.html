@@ -65,7 +65,7 @@
                 // fix virtual keyboard problems...
                 var onscroll = function (e) {
                     bigpicture.y(bigpicture.y() + $(window).scrollTop());
-                    $(window).off('scroll').scrollTop(0).on('scroll', onscroll); }, 0);
+                    $(window).off('scroll').scrollTop(0).on('scroll', onscroll);
                 }
                 $(window).on('scroll', onscroll);
             })();
