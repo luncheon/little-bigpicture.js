@@ -198,7 +198,7 @@ var little = (function () {
                 .on('blur',     '.text',                function (e) { $view.text.endEdit(this); })
                 .on('clicked',  '.text.selected',       function ()  { $view.text.beginEdit(this); })
                 .on('clicked',  '.text:not(.selected)', function ()  { $view.text.select(this); })
-                .on('dragging', '.text.selected',       function (_, previous, current) {
+                .on('dragging', '.text.selected:not(:focus)', function (_, previous, current) {
                     $(this).offset({
                         left: $(this).offset().left + (current.pageX - previous.pageX) / $view.scale(),
                         top:  $(this).offset().top  + (current.pageY - previous.pageY) / $view.scale(),
@@ -223,6 +223,9 @@ var little = (function () {
                 $view.focusingScale(o.deltaY < 0 ? 1.6 : 0.625, o.pageX, o.pageY);
             })
             .on('touchmove', function (e) {
+                if ($(e.target).is(':focus')) {
+                    return;
+                }
                 e.preventDefault();
                 var touches = e.originalEvent.touches;
                 if (touches && previousTouches && touches.length >= 2 && previousTouches.length >= 2) {
