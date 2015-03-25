@@ -23,9 +23,6 @@
                 <span class="button" onclick="bigpicture.biggest.toggle()" title="whole view">
                     <div class="fa fa-cloud"><span class="caption">whole</span></div>
                 </span>
-                <span class="button" onclick="bigpicture.moving($(this).toggleClass('selected').hasClass('selected')?'text':'view')" title="drag to move text">
-                    <div class="fa fa-arrows"><span class="caption">move</span></div>
-                </span>
             </div>
             <div class="toolbar edit" style="display: none;">
                 <span class="button" id="link" title="link">
@@ -41,26 +38,26 @@
         </div>
 
         <div id="content">
-            <div id="little-bigpicture" data-scale="1" data-x="721" data-y="480" data-moving="view" spellcheck="false">
-                <div contenteditable="true" class="text" data-size="57" data-x="941" data-y="735">What is Little BigPicture ?</div>
-                <div contenteditable="true" class="text" data-size="11.7647" data-x="977.918" data-y="812.327">Little BigPicture is like an infinite notepad, in which you can pan (north/south/east/west),<br />but also in which you can ZOOM ! (Nearly) infinitely many times.<br /></div>
-                <div contenteditable="true" class="text" data-size="20" data-x="853.918" data-y="946.974">Easy write in one click : click anywhere and write!</div>
-                <div contenteditable="true" class="text" data-size="6.92042" data-x="921.984" data-y="979.527">No need to go into a Toolbox and choose to create a new Textbox... Just click anywhere and write !</div>
-                <div contenteditable="true" class="text" data-size="20" data-x="1569.31" data-y="1022.37">More features to come...</div>
-                <div contenteditable="true" class="text" data-size="20" data-x="1200.31" data-y="558.372">Don't forget to zoom out...<br />... to see the BigPicture<br /></div>
-                <div contenteditable="true" class="text" data-size="34" data-x="1678.21" data-y="786.772">TODO</div>
-                <div contenteditable="true" class="text" data-size="14" data-x="1671.79" data-y="816.566">
+            <div id="little-bigpicture" data-scale="1" data-x="721" data-y="480" spellcheck="false">
+                <div class="text" data-size="57" data-x="941" data-y="735">What is Little BigPicture ?</div>
+                <div class="text" data-size="11.7647" data-x="977.918" data-y="812.327">Little BigPicture is like an infinite notepad, in which you can pan (north/south/east/west),<br />but also in which you can ZOOM ! (Nearly) infinitely many times.<br /></div>
+                <div class="text" data-size="20" data-x="853.918" data-y="946.974">Easy write in one click : click anywhere and write!</div>
+                <div class="text" data-size="6.92042" data-x="921.984" data-y="979.527">No need to go into a Toolbox and choose to create a new Textbox... Just click anywhere and write !</div>
+                <div class="text" data-size="20" data-x="1569.31" data-y="1022.37">More features to come...</div>
+                <div class="text" data-size="20" data-x="1200.31" data-y="558.372">Don't forget to zoom out...<br />... to see the BigPicture<br /></div>
+                <div class="text" data-size="34" data-x="1678.21" data-y="786.772">TODO</div>
+                <div class="text" data-size="14" data-x="1671.79" data-y="816.566">
 * text color
 * search (use browser's search function if possible)
 * bookmark: save/restore scale and position
 * mini map: indicates whole view and current visible area
                 </div>
-                <div contenteditable="true" class="text" data-size="11.7647" data-x="1787.46" data-y="792.461">buy some chocolate</div>
-                <div contenteditable="true" class="text" data-size="98.26" data-x="-2070.87" data-y="1698.75">This is not the biggest text yet... <br /></div>
-                <div contenteditable="true" class="text" data-size="482.751" data-x="3394.25" data-y="3171.58">Think outside the box.</div>
-                <div contenteditable="true" class="text" data-size="20" data-x="867.486" data-y="699.86">mind mapping tool</div>
-                <div contenteditable="true" class="text" data-size="36" data-x="1080" data-y="640"><a target="_blank" href="https://github.com/luncheon/little-bigpicture.js"><span class="fa fa-github"></span>GitHub</a></div>
-                <div contenteditable="true" class="text" data-size="18" data-x="600" data-y="560"><a href="little-bigpicture.html?data=%7B%22formatVersion%22%3A0.1%2C%22view%22%3A%7B%22x%22%3A0%2C%22y%22%3A0%2C%22scale%22%3A1%7D%2C%22text%22%3A%5B%5D%7D"><span class="fa fa-eraser"></span>clear all</a></div>
+                <div class="text" data-size="11.7647" data-x="1787.46" data-y="792.461">buy some chocolate</div>
+                <div class="text" data-size="98.26" data-x="-2070.87" data-y="1698.75">This is not the biggest text yet... <br /></div>
+                <div class="text" data-size="482.751" data-x="3394.25" data-y="3171.58">Think outside the box.</div>
+                <div class="text" data-size="20" data-x="867.486" data-y="699.86">mind mapping tool</div>
+                <div class="text" data-size="36" data-x="1080" data-y="640"><a target="_blank" href="https://github.com/luncheon/little-bigpicture.js"><span class="fa fa-github"></span>GitHub</a></div>
+                <div class="text" data-size="18" data-x="600" data-y="560"><a href="little-bigpicture.html?data=%7B%22formatVersion%22%3A0.1%2C%22view%22%3A%7B%22x%22%3A0%2C%22y%22%3A0%2C%22scale%22%3A1%7D%2C%22text%22%3A%5B%5D%7D"><span class="fa fa-eraser"></span>clear all</a></div>
             </div>
         </div>
 
@@ -75,37 +72,19 @@
                     bigpicture.localStorage.load();
                 }
 
-                var $focused = null;
+                bigpicture.on('select', function (e, selected) { $('.toolbar.edit').toggle(selected ? true : false); });
 
-                $('#link').on('mousedown', function () {
-                    bigpicture.text.link($focused, prompt('url', bigpicture.text.link($focused)));
+                $('#link'     ).on('click', function () { $selected = $('.selected'); bigpicture.text.link($selected, prompt('url', bigpicture.text.link($selected))); });
+                $('#size-up'  ).on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) * 1.25) }); });
+                $('#size-down').on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) / 1.25) }); });
+
+                $(document).on('focus', '.text', function (e) {
+                    setTimeout(function () {
+                        // show header after virtual keyboard hides header...
+                        bigpicture.y(bigpicture.y() + $(window).scrollTop());
+                        $(window).scrollTop(0);
+                    }, 0);
                 });
-
-                $('#size-up').on('mousedown', $.proxy(setTimeout, window, function () {
-                    bigpicture.text.size($focused, bigpicture.text.size($focused) * 1.25).focus();
-                }, 0));
-                $('#size-down').on('mousedown', $.proxy(setTimeout, window, function () {
-                    bigpicture.text.size($focused, bigpicture.text.size($focused) / 1.25).focus();
-                }, 0));
-
-                $(document)
-                    .on('focus', '.text', function (e) {
-                        $focused = $(this);
-                        $('.toolbar.edit').show();
-                        setTimeout(function () {
-                            // show header after virtual keyboard hides header...
-                            bigpicture.y(bigpicture.y() + $(window).scrollTop());
-                            $(window).scrollTop(0);
-                        }, 0);
-                    })
-                    .on('blur', '.text', function (e) {
-                        setTimeout(function () {
-                            if (!$focused.is(':focus')) {
-                                $('.toolbar.edit').hide();
-                            }
-                        }, 0);
-                    })
-                ;
             })();
         </script>
     </body>

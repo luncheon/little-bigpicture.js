@@ -2,13 +2,12 @@ var little = (function () {
     'use strict';
 
     this.bigpicture = function (element) {
+        var parsePixel = function (pixel) { return parseFloat(pixel.replace(/px$/, '')); }
+
         var $container = $('<div>')
             .addClass('little-bigpicture-container')
             .insertBefore(element);
 
-        var parsePixel = function (pixel) {
-            return parseFloat(pixel.replace(/px$/, ''));
-        }
         var $view = $.extend($(element), {
             json: {
                 formatVersion: 0.1,
@@ -77,41 +76,38 @@ var little = (function () {
                     return this.offset({left: this.offset().left, top: -y}).trigger('offset');
                 }
             },
-            moving: function (moving) {
-                if (moving === void 0) {
-                    return this.data('moving');
-                } else {
-                    return this.data('moving', moving).attr('data-moving', moving);
-                }
-            },
-            move: function (distanceX, distanceY, target) {
-                var $target = target ? $(target) : $(':focus');
-                if (this.moving() === 'text' && $target.hasClass('text')) {
-                    $target.offset({ left: $target.offset().left + distanceX / this.scale(), top: $target.offset().top + distanceY / this.scale() });
-                } else {
-                    $view.x($view.x() - distanceX).y($view.y() - distanceY);
-                }
-            },
             text: {
-                setup: function (element) {
-                    $(element)
-                        .on('keydown', function (e) { e.keyCode === 27 && this.blur(); })   // blur on Esc
-                        .on('blur', function (e) { $(this).text() || $(this).remove(); });
-                },
                 create: function (x, y, size) {
-                    var $text = $('<div>').addClass('text').attr('contentEditable', true);
+                    var $text = $('<div>').addClass('text');
                     this.x($text, x);
                     this.y($text, y);
                     this.size($text, size);
-                    this.setup($text);
                     return $text.appendTo($view);
                 },
                 createOnPageCoordinate: function (pageX, pageY) {
-                    return this.create((pageX + $view.x()) / $view.scale(), (pageY + $view.y()) / $view.scale(), 20 / $view.scale()).focus();
+                    return this.create((pageX + $view.x()) / $view.scale(), (pageY + $view.y()) / $view.scale(), 20 / $view.scale());
                 },
                 x:    function (element, x) { return x === void 0 ? parsePixel($(element).css('left'))     : $(element).css('left',     x + 'px'); },
                 y:    function (element, y) { return y === void 0 ? parsePixel($(element).css('top'))      : $(element).css('top',      y + 'px'); },
                 size: function (element, s) { return s === void 0 ? parsePixel($(element).css('fontSize')) : $(element).css('fontSize', s + 'px'); },
+                select: function (element) {
+                    $view.find('.selected').removeClass('selected');
+                    element && $(element).addClass('selected');
+                    $view.trigger('select', element);
+                    return element && $(element);
+                },
+                beginEdit: function (element) {
+                    return this.select($(element)).attr('contentEditable', true).focus();
+                },
+                endEdit: function (element) {
+                    var $text = $(element);
+                    if ($text.text()) {
+                        $text.attr('contentEditable', false);
+                    } else {
+                        $text.remove();
+                        this.select(null);
+                    }
+                },
                 link: function (element, link) {
                     if (link === void 0) {
                         return $(element).find('a').attr('href');
@@ -162,83 +158,89 @@ var little = (function () {
              .on('scale offset', function (e) { $view.biggest.previous = null; })
              .appendTo($container)
              .find('.text').each(function () {
-                 $view.text.setup($(this).css({ left: $(this).data('x'), top: $(this).data('y'), fontSize: $(this).data('size') + 'px' }));
+                 $(this).css({ left: $(this).data('x'), top: $(this).data('y'), fontSize: $(this).data('size') + 'px' });
              });
 
-        var mousedown = false;
-        var previousMouse = null;
+        // trigger 'clicked' and 'dragging' events.
+        //   [mousedown -> mousemove -> mouseup]     raises 'click' event by jQuery.
+        //   [mousedown -> mouseup (NOT mousemoved)] raises 'clicked' event by following code.
+        (function () {
+            var clone = function (e) {
+                var touches = [];
+                for (var i = 0, len = e.touches.length; i < len; i++) {
+                    touches.push({ pageX: e.touches[i].pageX, pageY: e.touches[i].pageY });
+                }
+                return { target: e.target, touches: touches };
+            }
+
+            var mouse = null, mousedown = null, mousemoved = false;
+            var touch = null, touchdown = null, touchmoved = false;
+            $(document)
+                .on('mousedown',  function (e) { mousemoved = false; mouse = mousedown = e; })
+                .on('touchstart', function (e) { touchmoved = false; touch = touchdown = clone(e.originalEvent); })
+                .on('mouseup',    function (e) { mousedown = null; mousemoved || $(e.target).trigger('clicked', e); })
+                .on('touchend',   function (e) { touchdown = null; touchmoved || $(e.target).trigger('clicked', e.originalEvent.changedTouches[0]); })
+                .on('mousemove',  function (e) {
+                    if (!mousedown || (mouse.pageX === e.pageX && mouse.pageY === e.pageY)) {
+                        return;
+                    }
+                    mousemoved = true;
+                    $(mousedown.target).trigger('dragging', [mouse, e]);
+                    mouse = e;
+                })
+                .on('touchmove',  function (e) {
+                    touchmoved = true;
+                    $(touchdown.target).trigger('dragging', [touch.touches[0], e.originalEvent.touches[0]]);
+                    touch = clone(e.originalEvent);
+                });
+        })();
+
+        // text event handlers
+        (function () {
+            $(document)
+                .on('keydown',  '.text',                function (e) { e.keyCode === 27 && this.blur(); })  // blur on esc key
+                .on('blur',     '.text',                function (e) { $view.text.endEdit(this); })
+                .on('clicked',  '.text.selected',       function ()  { $view.text.beginEdit(this); })
+                .on('clicked',  '.text:not(.selected)', function ()  { $view.text.select(this); })
+                .on('dragging', '.text.selected',       function (_, previous, current) {
+                    $(this).offset({
+                        left: $(this).offset().left + (current.pageX - previous.pageX) / $view.scale(),
+                        top:  $(this).offset().top  + (current.pageY - previous.pageY) / $view.scale(),
+                    });
+                })
+                ;
+        })();
+
         var previousTouches = null;
-        var touchmoved = false;
-        $(window).on('mouseup', function (e) { mousedown = false; });
         $container
-            .on('dragstart', function (e) { e.preventDefault(); })
-            .on('mousedown', function (e) { previousMouse = e; mousedown = true; })
-            .on('mousemove', function (e) {
-                if (mousedown && ((e.pageX - previousMouse.pageX) || (e.pageY - previousMouse.pageY))) {
-                    e.preventDefault();
-                    $view.move(e.pageX - previousMouse.pageX, e.pageY - previousMouse.pageY);
-                }
-                previousMouse = e;
+            .on('dragstart gesturestart touchend', function (e) { e.preventDefault(); })
+            .on('mousedown touchstart', function (e) { $(e.target).hasClass('selected') || $view.text.select(null); })
+            .on('dragging', function (e, previous, current) {
+                $(e.target).hasClass('selected') || $view.x($view.x() + previous.pageX - current.pageX).y($view.y() + previous.pageY - current.pageY);
             })
-            .on('click', function (e) {
-                // ignore drag and drop
-                if (previousMouse && previousMouse.type !== 'mousedown') {
-                    return;
-                }
-                // edit existing
-                if ($(e.target).hasClass('text') || $(e.target).is('a')) {
-                    return;
-                }
-                $view.text.createOnPageCoordinate(e.pageX, e.pageY);
+            .on('clicked', function (_, e) {
+                $(e.target).hasClass('text') || $view.text.beginEdit($view.text.createOnPageCoordinate(e.pageX, e.pageY));
             })
             .on('wheel', function (e) {
                 e.preventDefault();
-                $view.focusingScale(
-                    e.originalEvent.deltaY < 0 ? 1.6 : 0.625,
-                    previousMouse && previousMouse.pageX,
-                    previousMouse && previousMouse.pageY
-                );
-            })
-            .on('gesturestart', function (e) { e.preventDefault(); })
-            .on('touchstart', function (e) {
-                touchmoved = false;
+                var o = e.originalEvent;
+                $view.focusingScale(o.deltaY < 0 ? 1.6 : 0.625, o.pageX, o.pageY);
             })
             .on('touchmove', function (e) {
-                touchmoved = true;
                 e.preventDefault();
                 var touches = e.originalEvent.touches;
-                if (touches && previousTouches) {
-                    if (touches.length >= 1 && previousTouches.length >= 1) {
-                        $view.move(touches[0].pageX - previousTouches[0].pageX, touches[0].pageY - previousTouches[0].pageY, e.target);
-                    }
-                    if (touches.length >= 2 && previousTouches.length >= 2) {
-                        $view.focusingScale(
-                            Math.sqrt(Math.pow(touches[0].pageX - touches[1].pageX, 2) + Math.pow(touches[0].pageY - touches[1].pageY, 2)) /
-                            Math.sqrt(Math.pow(previousTouches[0].pageX - previousTouches[1].pageX, 2) + Math.pow(previousTouches[0].pageY - previousTouches[1].pageY, 2)),
-                            (touches[0].pageX + touches[1].pageX) / 2,
-                            (touches[0].pageY + touches[1].pageY) / 2
-                        );
-                    }
+                if (touches && previousTouches && touches.length >= 2 && previousTouches.length >= 2) {
+                    $view.focusingScale(
+                        Math.sqrt(Math.pow(touches[0].pageX - touches[1].pageX, 2) + Math.pow(touches[0].pageY - touches[1].pageY, 2)) /
+                        Math.sqrt(Math.pow(previousTouches[0].pageX - previousTouches[1].pageX, 2) + Math.pow(previousTouches[0].pageY - previousTouches[1].pageY, 2)),
+                        (touches[0].pageX + touches[1].pageX) / 2,
+                        (touches[0].pageY + touches[1].pageY) / 2
+                    );
                 }
                 // deep copy touches; touches may be recycled on next touchmove event
                 previousTouches = [];
                 for (var i = 0, len = touches.length; i < len; i++) {
                     previousTouches.push({ pageX: touches[i].pageX, pageY: touches[i].pageY });
-                }
-            })
-            .on('touchend', function (e) {
-                previousTouches = null;
-                if (touchmoved) {
-                    e.preventDefault();
-                }
-                if ($(e.target).hasClass('text') || $(e.target).is('a')) {
-                    return;
-                }
-                var touches = e.originalEvent.changedTouches;
-                if (!touchmoved && touches.length === 1) {
-                    // touch and unmoved: click
-                    e.preventDefault();
-                    $view.text.createOnPageCoordinate(touches[0].pageX, touches[0].pageY);
                 }
             })
             ;
