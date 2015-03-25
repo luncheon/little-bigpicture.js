@@ -152,14 +152,10 @@ var little = (function () {
         });
 
         $view.addClass('little-bigpicture-content')
-             .scale($view.data('scale') || 1)
-             .x($view.data('x'))
-             .y($view.data('y'))
+             .scale($view.data('scale') || 1).x($view.data('x') || 0).y($view.data('y') || 0)
              .on('scale offset', function (e) { $view.biggest.previous = null; })
              .appendTo($container)
-             .find('.text').each(function () {
-                 $(this).css({ left: $(this).data('x'), top: $(this).data('y'), fontSize: $(this).data('size') + 'px' });
-             });
+             .find('.text').each(function () { $(this).css({ left: $(this).data('x'), top: $(this).data('y'), fontSize: $(this).data('size') + 'px' }); });
 
         // trigger 'clicked' and 'dragging' events.
         //   [mousedown -> mousemove -> mouseup]     raises 'click' event by jQuery.
