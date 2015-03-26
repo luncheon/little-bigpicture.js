@@ -83,7 +83,7 @@ a {
     background: transparent;
 }
 @media (max-width: 480px) {
-    .pure-menu-horizontal {
+    .pure-menu.horizontal {
         padding-left: 0;
     }
     .pure-menu-link {
