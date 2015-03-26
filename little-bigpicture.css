@@ -38,7 +38,7 @@ a {
     background: #FFFFCC;
     cursor: move;
 }
-.text:focus {
+.text.editing {
     background: #FFFFFF;
     min-width: .75em;
     cursor: text;

@@ -107,12 +107,12 @@ var little = (function () {
                     return element && $(element);
                 },
                 beginEdit: function (element) {
-                    return this.select($(element)).attr('contentEditable', true).focus();
+                    return this.select($(element)).addClass('editing').attr('contentEditable', true).focus();
                 },
                 endEdit: function (element) {
                     var $text = $(element);
                     if ($text.text()) {
-                        $text.attr('contentEditable', false);
+                        $text.removeClass('editing').attr('contentEditable', false);
                     } else {
                         $text.remove();
                         this.select(null);
@@ -208,7 +208,7 @@ var little = (function () {
                 .on('blur',     '.text',                function (e) { $view.text.endEdit(this); })
                 .on('clicked',  '.text.selected',       function ()  { $view.text.beginEdit(this); })
                 .on('clicked',  '.text:not(.selected)', function ()  { $view.text.select(this); })
-                .on('dragging', '.text.selected:not(:focus)', function (_, previous, current) {
+                .on('dragging', '.text.selected:not(.editing)', function (e, previous, current) {
                     $(this).offset({
                         left: $(this).offset().left + (current.pageX - previous.pageX) / $view.scale(),
                         top:  $(this).offset().top  + (current.pageY - previous.pageY) / $view.scale(),
@@ -220,7 +220,7 @@ var little = (function () {
         var previousTouches = null;
         $container
             .on('dragstart gesturestart touchend', function (e) { e.preventDefault(); })
-            .on('mousemove touchmove', function (e) { $(e.target).is(':focus') || e.preventDefault(); })
+            .on('mousemove touchmove', function (e) { $(e.target).hasClass('editing') || e.preventDefault(); })
             .on('mousedown touchstart', function (e) { $(e.target).hasClass('selected') || $view.text.select(null); })
             .on('dragging', function (e, previous, current) {
                 $(e.target).hasClass('selected') || $view.x($view.x() + previous.pageX - current.pageX).y($view.y() + previous.pageY - current.pageY);
