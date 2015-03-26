@@ -10,7 +10,7 @@ var little = (function () {
 
         var $view = $.extend($(element), {
             json: {
-                formatVersion: 0.1,
+                formatVersion: 'little-bigpicture.js:0.1',
                 extract: function (jsonString) {
                     var data = JSON.parse(jsonString);
                     if (data && data.formatVersion === this.formatVersion) {
@@ -36,6 +36,7 @@ var little = (function () {
                 load:   function (name) { $view.json.extract(localStorage.getItem(name || this.defaultName)); },
                 save:   function (name) { localStorage.setItem(name || this.defaultName, $view.json.generate()); },
                 remove: function (name) { localStorage.removeItem(name || this.defaultName); },
+                list:   function ()     { return Object.keys(localStorage); },
             },
             url: {
                 queryPrefix: '?data=',

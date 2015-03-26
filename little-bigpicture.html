@@ -6,43 +6,50 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <title>Little BigPicture</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/pure/0.6.0/pure-min.css">
         <link rel="stylesheet" href="little-bigpicture.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
         <script src="lib/lz-string.min.js"></script>
         <script src="little-bigpicture.js"></script>
     </head>
     <body>
-        <div id="header">
-            <div class="toolbar">
-                <span class="button" onclick="bigpicture.localStorage.save();" title="save to localStorage">
-                    <span class="fa fa-database"></span>
-                    <span class="caption">save</span>
-                </span>
-                <span class="button" onclick="prompt('parameterized url', bigpicture.url.generate());" title="generate parameterized url">
-                    <span class="fa fa-anchor"></span>
-                    <span class="caption">to url</span>
-                </span>
-                <span class="button" onclick="bigpicture.biggest.toggle()" title="whole view">
-                    <span class="fa fa-cloud"></span>
-                    <span class="caption">whole</span>
-                </span>
-            </div>
-            <div class="toolbar edit" style="display: none;">
-                <span class="button" id="link" title="link">
-                    <span class="fa fa-link"></span>
-                    <span class="caption">link</span>
-                </span>
-                <span class="button" id="size-up" title="increment font size">
-                    <span class="fa fa-font"></span>+
-                </span>
-                <span class="button" id="size-down" title="decrement font size">
-                    <span class="fa fa-font"></span>-
-                </span>
-            </div>
-        </div>
-
         <div id="content">
             <div id="little-bigpicture" spellcheck="false"></div>
+        </div>
+
+        <div id="menu-default">
+            <ul class="pure-menu pure-menu-horizontal" style="position: fixed; left: 0; top: 0;">
+                <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                    <span class="pure-menu-link">File</span>
+                    <ul class="pure-menu-children">
+                        <li class="pure-menu-item">
+                            <span class="pure-menu-link" title="clear all" onclick="confirm('Clear?') && $('.text').remove();">New</span>
+                        </li>
+                        <li class="pure-menu-item">
+                            <span class="pure-menu-link" title="save to localStorage" onclick="bigpicture.localStorage.save();">Save</span>
+                        </li>
+                        <li class="pure-menu-item">
+                            <span class="pure-menu-link" title="generate parameterized url" onclick="prompt('parameterized url', bigpicture.url.generate());">Generate Url</span>
+                        </li>
+                    </ul>
+                </li>
+                <li class="pure-menu-item">
+                    <span class="pure-menu-link" title="whole view" onclick="bigpicture.biggest.toggle()">Whole View</span>
+                </li>
+            </ul>
+        </div>
+        <div id="menu-edit" style="display: none;">
+            <ul class="pure-menu pure-menu-horizontal">
+                <li class="pure-menu-item">
+                    <span class="pure-menu-link" id="link">Link</span>
+                </li>
+                <li class="pure-menu-item">
+                    <span class="pure-menu-link" id="size-up">A+</span>
+                </li>
+                <li class="pure-menu-item">
+                    <span class="pure-menu-link" id="size-down">A-</span>
+                </li>
+            </ul>
         </div>
 
         <script>
@@ -56,19 +63,11 @@
                     bigpicture.localStorage.load();
                 }
 
-                bigpicture.on('select', function (e, selected) { $('.toolbar.edit').toggle(selected ? true : false); });
+                bigpicture.on('select', function (e, selected) { $('#menu-edit').toggle(selected ? true : false); });
 
-                $('#link'     ).on('click', function () { var $selected = $('.selected'); bigpicture.text.link($selected, prompt('url', bigpicture.text.link($selected))); });
+                $('#link'     ).on('click', function () { var $selected = $('.selected'); bigpicture.text.link($selected, prompt('url', bigpicture.text.link($selected) || '')); });
                 $('#size-up'  ).on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) * 1.25) }); });
                 $('#size-down').on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) / 1.25) }); });
-
-                $(document).on('focus', '.text', function (e) {
-                    setTimeout(function () {
-                        // show header after virtual keyboard hides header...
-                        bigpicture.y(bigpicture.y() + $(window).scrollTop());
-                        $(window).scrollTop(0);
-                    }, 0);
-                });
             })();
         </script>
     </body>
