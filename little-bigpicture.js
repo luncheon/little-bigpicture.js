@@ -36,10 +36,15 @@ var little = (function () {
                 },
             },
             localStorage: {
-                load:   function (name) { if (name) { $view.json.extract(localStorage.getItem(name)); this.current.name = name; } },
-                save:   function (name) { if (name) { localStorage.setItem(name, $view.json.generate()); this.current.name = name; } },
-                remove: function (name) { name && localStorage.removeItem(name); },
-                list:   function ()     { return Object.keys(localStorage); },
+                prefix: 'little-bigpicture.js:',
+                load:   function (name) { if (name) { $view.json.extract(localStorage.getItem(this.prefix + name)); this.current.name = name; } },
+                save:   function (name) { if (name) { localStorage.setItem(this.prefix + name, $view.json.generate()); this.current.name = name; } },
+                remove: function (name) { name && localStorage.removeItem(this.prefix + name); },
+                list:   function () {
+                    return Object.keys(localStorage)
+                        .filter(function (item) { return item.slice(0, this.prefix.length) === this.prefix; }, this)
+                        .map(function (item) { return item.slice(this.prefix.length); }, this);
+                },
                 current: { name: null },
             },
             url: {
