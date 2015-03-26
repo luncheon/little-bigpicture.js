@@ -92,3 +92,6 @@ a {
         padding-right: .5em;
     }
 }
+.pure-menu.horizontal>.pure-menu-item{display:inline-block;*display:inline;zoom:1;vertical-align:middle}
+.pure-menu.horizontal>.pure-menu-has-children>.pure-menu-link:after{content:"\25BE"}
+.pure-menu.horizontal>.pure-menu-has-children>.pure-menu-children{left:0;top:auto;width:inherit}

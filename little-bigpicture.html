@@ -18,18 +18,22 @@
         </div>
 
         <div id="menu-default">
-            <ul class="pure-menu pure-menu-horizontal" style="position: fixed; left: 0; top: 0;">
+            <ul class="pure-menu horizontal">
                 <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                     <span class="pure-menu-link">File</span>
                     <ul class="pure-menu-children">
                         <li class="pure-menu-item">
-                            <span class="pure-menu-link" title="clear all" onclick="confirm('Clear?') && $('.text').remove();">New</span>
+                            <span class="pure-menu-link" title="clear all" onclick="bigpicture.clear()">New</span>
+                        </li>
+                        <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                            <span class="pure-menu-link">Load</span>
+                            <ul class="pure-menu-children" id="load"></ul>
                         </li>
                         <li class="pure-menu-item">
-                            <span class="pure-menu-link" title="save to localStorage" onclick="bigpicture.localStorage.save();">Save</span>
+                            <span class="pure-menu-link" id="save-as" title="save to localStorage">Save As...</span>
                         </li>
                         <li class="pure-menu-item">
-                            <span class="pure-menu-link" title="generate parameterized url" onclick="prompt('parameterized url', bigpicture.url.generate());">Generate Url</span>
+                            <span class="pure-menu-link" title="generate parameterized url" onclick="prompt('parameterized url', bigpicture.url.generate())">Generate URL</span>
                         </li>
                     </ul>
                 </li>
@@ -52,19 +56,35 @@
             </ul>
         </div>
 
+        <script type="text/template" id="load-item-template">
+            <li class="pure-menu-item">
+                <span class="pure-menu-link" onclick="bigpicture.localStorage.load('{{name}}')">{{name}}</span>
+            </li>
+        </script>
         <script>
             var bigpicture = little.bigpicture(document.querySelector('#little-bigpicture'));
             (function () {
                 'use strict';
 
-                if (location.search) {
-                    bigpicture.url.parse();
-                } else if (localStorage) {
-                    bigpicture.localStorage.load();
+                location.search && bigpicture.url.parse();
+
+                if (localStorage) {
+                    bigpicture.localStorage.list().forEach(function (name) { $('#load').append($('#load-item-template').text().replace(/{{name}}/g, name)); });
+                } else {
+                    $('#load').parent().remove();
+                    $('#save-as').remove();
                 }
 
                 bigpicture.on('select', function (e, selected) { $('#menu-edit').toggle(selected ? true : false); });
 
+                $('#save-as').on('click', function () {
+                    var name = prompt('name', bigpicture.localStorage.current.name || $('.text').first().text());
+                    if (name) {
+                        var overwrite = bigpicture.localStorage.list().indexOf(name) !== -1;
+                        bigpicture.localStorage.save(name);
+                        overwrite || $('#load').append($('#load-item-template').text().replace(/{{name}}/g, name));
+                    }
+                });
                 $('#link'     ).on('click', function () { var $selected = $('.selected'); bigpicture.text.link($selected, prompt('url', bigpicture.text.link($selected) || '')); });
                 $('#size-up'  ).on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) * 1.25) }); });
                 $('#size-down').on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) / 1.25) }); });

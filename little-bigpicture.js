@@ -9,6 +9,10 @@ var little = (function () {
             .insertBefore(element);
 
         var $view = $.extend($(element), {
+            clear: function () {
+                this.scale(1).x(0).y(0).find('.text').remove();
+                return this;
+            },
             json: {
                 formatVersion: 'little-bigpicture.js:0.1',
                 extract: function (jsonString) {
@@ -32,11 +36,11 @@ var little = (function () {
                 },
             },
             localStorage: {
-                defaultName: 'default',
-                load:   function (name) { $view.json.extract(localStorage.getItem(name || this.defaultName)); },
-                save:   function (name) { localStorage.setItem(name || this.defaultName, $view.json.generate()); },
-                remove: function (name) { localStorage.removeItem(name || this.defaultName); },
+                load:   function (name) { if (name) { $view.json.extract(localStorage.getItem(name)); this.current.name = name; } },
+                save:   function (name) { if (name) { localStorage.setItem(name, $view.json.generate()); this.current.name = name; } },
+                remove: function (name) { name && localStorage.removeItem(name); },
                 list:   function ()     { return Object.keys(localStorage); },
+                current: { name: null },
             },
             url: {
                 queryPrefix: '?data=',
