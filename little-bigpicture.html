@@ -88,6 +88,21 @@
                 $('#link'     ).on('click', function () { var $selected = $('.selected'); bigpicture.text.link($selected, prompt('url', bigpicture.text.link($selected) || '')); });
                 $('#size-up'  ).on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) * 1.25) }); });
                 $('#size-down').on('click', function () { $('.selected').each(function () { bigpicture.text.size(this, bigpicture.text.size(this) / 1.25) }); });
+
+                // temporary fix for iOS 8 virtual keyboard problem
+                var scrolled = 0;
+                $(document)
+                    .on('scroll', function () {
+                        var top = $(window).scrollTop();
+                        if (top) {
+                            scrolled += top;
+                            bigpicture.y(bigpicture.y() + top);
+                        }
+                    })
+                    .on('blur', '.text', function () {
+                        bigpicture.y(bigpicture.y() - scrolled);
+                        scrolled = 0;
+                    });
             })();
         </script>
     </body>
