@@ -20,6 +20,13 @@ a {
     position: relative;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+}
+
+.little-bigpicture-container:active {
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
 }
 
 .little-bigpicture-content {
